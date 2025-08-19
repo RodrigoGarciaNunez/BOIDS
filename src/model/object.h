@@ -9,10 +9,17 @@ class Object{
 public:
     Object(vector<float> position, float mass);
     virtual ~Object();
+    void movement2d(vector<float> movement);
+    
+    struct{
+        vector<float> position;
+        float mass;
+    }properties_;
+    
 
 private:
-    float mass;
-    vector<float> position;
+    
+    
 
 };
 
