@@ -22,7 +22,7 @@ Window::Window(float screenHeight, float screenWidht)
     
 }
 
-unique_ptr<GLFWwindow *> Window::start_GLF()
+shared_ptr<GLFWwindow *> Window::start_GLF()
 {
     if (!glfwInit())
     {
@@ -30,7 +30,7 @@ unique_ptr<GLFWwindow *> Window::start_GLF()
         return nullptr;
     }
 
-    unique_ptr<GLFWwindow *> window = make_unique<GLFWwindow *>
+    shared_ptr<GLFWwindow *> window = make_shared<GLFWwindow *>
         (glfwCreateWindow(properties.screenWidth, properties.screenHeight, "gravity_sim", NULL, NULL));
     
     return window;
