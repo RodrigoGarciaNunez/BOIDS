@@ -1,5 +1,8 @@
 #include "drawer.h"
 #include "../model/object.h"
+
+map<shared_ptr<Object>, bool> Drawer::bodies_to_draw;
+
 Drawer::Drawer()
 {
     
@@ -23,31 +26,31 @@ void Drawer::Draw_body(float centerX, float centerY, float radio, int res)
     glEnd();
 }
 
-void Drawer::update_body_matrix(vector<float> movement, vector<float> prev_position)
+void Drawer::update_body_matrix(pair<float, float> movement, pair<float, float> prev_position)
 {
-    if (movement[0] != 0 && movement[1] != 0)
+    if (movement.first != 0 && movement.second != 0)
     {
         glPushMatrix(); // agarras la matriz
-        glTranslatef(movement[0], movement[1], 0);
-        Draw_body(prev_position[0], prev_position[1], 50.0f, 50);
+        glTranslatef(movement.first, movement.second, 0);
+        Draw_body(prev_position.first, prev_position.second, 50.0f, 50);
         glPopMatrix();
     }
 }
 
 void Drawer::Erase()
-{
-}
+{}
 
 void Drawer::update_frame()
 {
     properties_ body_properties;
     for (auto &body : bodies_to_draw)
     {
+        //body.first->u_lock.lock();
         body_properties= (body.first)->getProperties(); 
         if (body.second == true) //si es true, el objeto cambió. Hay que actualizar la matriz   
             update_body_matrix(body_properties.movement,body_properties.position);
         else 
-            Draw_body(body_properties.position[0], body_properties.position[1], 
+            Draw_body(body_properties.position.first, body_properties.position.second, 
                 body_properties.radio, 50);
         
         body.second= false;

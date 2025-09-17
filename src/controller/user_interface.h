@@ -1,19 +1,25 @@
 #pragma once
 
-#include "../model/object.h"
-#include "../view/drawer.h"
+//#include "../model/object.h"
+//#include "../view/drawer.h"
+//#include "object_creator.h"
 #include <GLFW/glfw3.h>
 #include <memory>
 #include <iostream>
 #include <vector>
 
 using std::shared_ptr;
+using std::unique_ptr;
+using std::make_unique;
 using std::make_shared;
 using std::cerr;
 using std::endl;
 using std::vector;
+using std::enable_shared_from_this;
 
 struct Object;
+struct object_creator;
+struct Drawer;
 
 class user_interface: public enable_shared_from_this<user_interface>{
 public:
@@ -25,4 +31,5 @@ public:
 private:
     shared_ptr<GLFWwindow*> window;
     shared_ptr<Drawer> drw_;
+    unique_ptr<object_creator> obj_creator;
 };
