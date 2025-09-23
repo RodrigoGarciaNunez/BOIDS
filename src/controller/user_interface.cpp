@@ -25,7 +25,7 @@ void user_interface::add_object_by_click(GLFWwindow *window, int button, int act
 
             glfwGetCursorPos(window, &x, &y);
             pair<float, float> position = {(float)x, (float)y};
-
+            cerr << position.first << position.second << endl;
             shared_ptr<Object> objeto = this_->obj_creator->create_object(position);
 
             objeto->record_object();

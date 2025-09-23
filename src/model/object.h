@@ -10,6 +10,7 @@
 #include <functional> //para pasar funciones como argumentos
 #include <mutex>
 #include <utility>
+#include <cmath>
 
 
 using std::make_unique;
@@ -29,6 +30,8 @@ using std::mutex;
 using std::lock_guard;
 using std::unique_lock;
 using std::defer_lock;
+using std::pow;
+using std::cin;
 
 using properties_ = struct properties_{ 
         //vector<float> position;
