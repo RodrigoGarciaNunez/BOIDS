@@ -15,6 +15,7 @@ using std::make_shared;
 using std::cerr;
 using std::endl;
 using std::vector;
+using std::array;
 using std::enable_shared_from_this;
 
 struct Object;

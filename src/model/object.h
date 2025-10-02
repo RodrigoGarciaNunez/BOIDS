@@ -23,8 +23,10 @@ using std::random_device;
 using std::uniform_real_distribution;
 using std::vector;
 using std::pair;
+using std::array;
 using std::function;
 using std::cerr;
+using std::cout;
 using std::endl;
 using std::mutex;
 using std::lock_guard;
@@ -36,8 +38,8 @@ using std::cin;
 using properties_ = struct properties_{ 
         //vector<float> position;
         //vector<float> movement;
-        pair<float, float> position;
-        pair<float, float> movement;
+        array<float, 3> position;
+        array<float, 3> movement;
         float mass;
         float radio;
         float acceleration;
@@ -48,9 +50,9 @@ struct Drawer; //fordward declaration
 
 class Object:public enable_shared_from_this<Object>{
 public:
-    Object(pair<float, float> position, float mass, float radio);
+    Object(array<float, 3> position, float mass, float radio);
     virtual ~Object();
-    void movement2d(pair<float, float> movement);
+    void movement2d(array<float, 3> movement);
     void movement2d();
 
     void record_object();
@@ -58,7 +60,7 @@ public:
     properties_ getProperties();
     void run();
 
-    pair<float, float> boid_movement(); //se usa static para evitar que dependa de la instanccia
+    array<float, 3> boid_movement(); //se usa static para evitar que dependa de la instanccia
 
   
 

@@ -5,7 +5,7 @@ object_creator::object_creator(){}
 
 object_creator::~object_creator(){}
 
-shared_ptr<Object> object_creator::create_object(pair<float, float> position){
+shared_ptr<Object> object_creator::create_object(array<float,3> position){
     
     shared_ptr<Object> obj = make_shared<Object>(position, 100, 50);
     

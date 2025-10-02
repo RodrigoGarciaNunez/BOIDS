@@ -3,7 +3,12 @@
 // #define GLF_WINDOW_H
 
 
+#define GLAD_GL_IMPLEMENTATION
+#include "../../include/glad/glad.h"
+#define GLFW_INCLUDE_NONE
+
 #include <GLFW/glfw3.h>
+
 #include <memory>
 #include <iostream>
 #include <cmath>
@@ -21,8 +26,6 @@ using std::vector;
 class Window{
 public:
     Window(float screenHeight, float screenWidht);
-    void draw_frame(float centerX, float centerY, float radio, int re);
-    void move_body(vector<float>movement, vector<float> prev_pos);
     shared_ptr<GLFWwindow*> window_;
 
 private:
