@@ -3,20 +3,46 @@
 
 map<shared_ptr<Object>, bool> Drawer::bodies_to_draw;
 
-static const Vertex vertices[3] = {
-    {{-0.6f, -0.4f}, {1.f, 0.f, 0.f}},
-    {{0.6f, -0.4f}, {0.f, 1.f, 0.f}},
-    {{0.f, 0.6f}, {0.f, 0.f, 1.f}}};
+static const Vertex vertices[18] = { //cono
+    // Base (dos triángulos)
+    {{-0.5f, 0.0f, -0.5f}, {1.f, 0.f, 0.f }},
+    {{0.5f, 0.0f, -0.5f}, {0.f, 1.f, 0.f }},
+    {{0.5f, 0.0f,  0.5f}, {0.f, 0.f, 1.f }},
+
+    {{0.5f, 0.0f,  0.5f},{  0.f, 0.f, 1.f }},
+    { {-0.5f, 0.0f,  0.5f}, { 1.f, 1.f, 0.f }},
+    { {-0.5f, 0.0f, -0.5f},  {1.f, 0.f, 0.f }},
+
+    // Cara 1
+    { {0.0f, 1.0f, 0.0f},   {1.f, 0.f, 0.f}},
+    { {-0.5f, 0.0f, -0.5f}, {0.f, 1.f, 0.f} },
+    {  {0.5f, 0.0f, -0.5f}, {0.f, 0.f, 1.f} },
+
+    // Cara 2
+    { {0.0f, 1.0f, 0.0f},   {1.f, 0.f, 0.f} },
+    { {0.5f, 0.0f, -0.5f},  {0.f, 1.f, 0.f} },
+    { {0.5f, 0.0f,  0.5f},  {0.f, 0.f, 1.f} },
+
+    // Cara 3
+    { {0.0f, 1.0f, 0.0f},   {1.f, 0.f, 0.f }},
+    { {0.5f, 0.0f, 0.5f},   {0.f, 1.f, 0.f }},
+    { {-0.5f, 0.0f, 0.5f},  {0.f, 0.f, 1.f }},
+
+    // Cara 4
+    { {0.0f, 1.0f, 0.0f},   {1.f, 0.f, 0.f} },
+    { {-0.5f, 0.0f, 0.5f},  {0.f, 1.f, 0.f} },
+    { {-0.5f, 0.0f, -0.5f}, {0.f, 0.f, 1.f} },
+    };
 
 static const char *vertex_shader_text =
     "#version 330\n"
     "uniform mat4 MVP;\n"
     "in vec3 vCol;\n"
-    "in vec2 vPos;\n"
+    "in vec3 vPos;\n"
     "out vec3 color;\n"
     "void main()\n"
     "{\n"
-    "    gl_Position = MVP * vec4(vPos, 0.0, 1.0);\n"
+    "    gl_Position = MVP * vec4(vPos, 1.0);\n"
     "    color = vCol;\n"
     "}\n";
 
@@ -35,6 +61,14 @@ Drawer::Drawer(shared_ptr<GLFWwindow *> window_)
     
     ShaderProgram = createShaderProgram();
     GLuint auxVAO = createVertexArray(ShaderProgram);
+
+    mat4x4_look_at(view, EYE, CENTER, UP);
+    
+    
+    glfwGetFramebufferSize(*(window.get()), &width, &height);
+    const float ratio = width / (float)height;
+    mat4x4_perspective(projection, 45.0f * (M_PI/180.0f), ratio, 0.1f, 100.0f);
+    //glEnable(GL_DEPTH_TEST);
 }
 
 // Drawer::~Drawer(){}
@@ -74,7 +108,7 @@ GLuint Drawer::createVertexArray(GLuint program)
     // Crear Vertex Buffer Object (almacena datos en GPU)
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // Crear Vertex Array Object (describe cómo leer el VBO)
     glGenVertexArrays(1, &VAO);
@@ -84,12 +118,12 @@ GLuint Drawer::createVertexArray(GLuint program)
     const GLint vpos_location_ = glGetAttribLocation(program, "vPos");
     const GLint vcol_location_ = glGetAttribLocation(program, "vCol");
 
-    mvp_location = mvp_location;
+    mvp_location = mvp_location_;
     vpos_location = vpos_location_;
     vcol_location = vcol_location_;
     // Configurar atributo posición
     glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
                           sizeof(Vertex), (void *)offsetof(Vertex, pos));
 
     // Configurar atributo color
@@ -99,6 +133,33 @@ GLuint Drawer::createVertexArray(GLuint program)
 
     return VAO; // Devolvemos el VAO para usarlo en el render
 }
+
+
+void Drawer::render()
+{
+    glViewport(0, 0, width, height);
+    glEnable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT);
+
+    mat4x4 model, mvp;
+
+    mat4x4_identity(model);
+    mat4x4_rotate_Z(model, model, (float)glfwGetTime());
+
+    mat4x4_mul(mvp, view, model);
+    mat4x4_mul(mvp, projection, mvp);
+
+    glUseProgram(ShaderProgram);
+    glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat *)&mvp);
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 18); // 6 caras x 3 vertices = 18
+
+    glfwSwapBuffers(*(window.get()));
+    glfwPollEvents();
+}
+
+
 
 vector<float> Drawer::generateCircleVertex(float radius, float resolution)
 {
@@ -114,30 +175,6 @@ vector<float> Drawer::generateCircleVertex(float radius, float resolution)
     }
 
     return vertices;
-}
-
-void Drawer::render()
-{
-    int width, height;
-    glfwGetFramebufferSize(*(window.get()), &width, &height);
-    const float ratio = width / (float)height;
-
-    glViewport(0, 0, width, height);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    mat4x4 m, p, mvp;
-    mat4x4_identity(m);
-    mat4x4_rotate_Z(m, m, (float)glfwGetTime());
-    mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-    mat4x4_mul(mvp, p, m);
-
-    glUseProgram(ShaderProgram);
-    glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat *)&mvp);
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    glfwSwapBuffers(*(window.get()));
-    glfwPollEvents();
 }
 
 // void Drawer::update_body_matrix(array<float, 3> movement, array<float, 3> prev_position)

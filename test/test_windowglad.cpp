@@ -39,7 +39,6 @@ int main(){
 
     while(!glfwWindowShouldClose(*(main_window->window_.get()))){
         drawer->render();
-        cerr << "hola" << endl;
    
     }
     return 0;

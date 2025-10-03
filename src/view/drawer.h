@@ -23,10 +23,12 @@ using std::pair;
 using std::array;
 
 
+
+
 struct Object; //fordward declaration
 
 using Vertex = struct Vertex{
-    vec2 pos; //atributo de posicíon
+    vec3 pos; //atributo de posicíon
     vec3 col; //atributo de color
 };
 
@@ -64,6 +66,20 @@ private:
     GLint vcol_location;
     GLuint VBO, VAO;
     GLuint ShaderProgram;
+    
+
+    //camera
+    mat4x4 view;
+    const vec3 EYE =  { 0.0f, 6.0f, 3.0f };
+    const vec3 CENTER =  { 0.0f, 0.0f, 0.0f };
+    const vec3 UP = { 0.0f, 1.0f, 0.0f }; 
+
+    // perspectiva
+    mat4x4 projection;
+
+    //pantalla
+    int height, width;
+
     
 };
 
