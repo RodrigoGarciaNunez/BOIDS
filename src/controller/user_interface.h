@@ -3,6 +3,11 @@
 //#include "../model/object.h"
 //#include "../view/drawer.h"
 //#include "object_creator.h"
+
+#define GLAD_GL_IMPLEMENTATION
+#include "../../include/glad/glad.h"
+#define GLFW_INCLUDE_NONE
+
 #include <GLFW/glfw3.h>
 #include <memory>
 #include <iostream>
@@ -21,6 +26,8 @@ using std::enable_shared_from_this;
 struct Object;
 struct object_creator;
 struct Drawer;
+
+extern shared_ptr<Drawer> drawer; 
 
 class user_interface: public enable_shared_from_this<user_interface>{
 public:

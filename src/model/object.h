@@ -35,6 +35,14 @@ using std::defer_lock;
 using std::pow;
 using std::cin;
 
+
+#define X_SUPERIOR_LIM 750
+#define Y_SUPERIOR_LIM 550
+#define Z_SUPERIOR_LIM 550
+#define X_INFERIOR_LIM 50
+#define Y_INFERIOR_LIM 50
+#define Z_INFERIOR_LIM 50
+
 using properties_ = struct properties_{ 
         //vector<float> position;
         //vector<float> movement;
@@ -47,6 +55,8 @@ using properties_ = struct properties_{
 };
 
 struct Drawer; //fordward declaration
+
+extern shared_ptr<Drawer> drawer; 
 
 class Object:public enable_shared_from_this<Object>{
 public:

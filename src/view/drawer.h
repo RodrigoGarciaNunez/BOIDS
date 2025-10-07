@@ -1,12 +1,11 @@
 #pragma once
 
-
-
 #define GLAD_GL_IMPLEMENTATION
 #include "../../include/glad/glad.h"
 #define GLFW_INCLUDE_NONE
 
 #include <GLFW/glfw3.h>
+#include <iostream>
 #include <cmath>
 #include <vector>
 #include <map>
@@ -21,9 +20,8 @@ using std::map;
 using std::shared_ptr;
 using std::pair;
 using std::array;
-
-
-
+using std::cin;
+using std::enable_shared_from_this;
 
 struct Object; //fordward declaration
 
@@ -34,10 +32,11 @@ using Vertex = struct Vertex{
 
 
 
-class Drawer{
+class Drawer: public enable_shared_from_this<Drawer>{
 public:
     Drawer(shared_ptr<GLFWwindow *> window_);
-    GLuint createVertexArray(GLuint program);
+    GLuint createVertexArray();
+    void register_Vertex_Array(shared_ptr<Object> objecto);
     vector<float> generateCircleVertex(float radius, float resolution);
     void render();
 
@@ -45,7 +44,7 @@ public:
 
     void update_body_matrix(array<float, 3> movement, array<float, 3>prev_position);
 
-    static map<shared_ptr<Object>, bool> bodies_to_draw; //este funciona para saber si el cuerpo se debe actualizar o sólo se imprime como está para el siguiente frame
+    static map<shared_ptr<Object>, pair<GLuint, bool>> bodies_to_draw; //este funciona para saber si el cuerpo se debe actualizar o sólo se imprime como está para el siguiente frame
     const float PI = 3.14159265359f;
 
 private:
@@ -64,13 +63,13 @@ private:
     GLint mvp_location; //"MVP" (matriz Model-View-Projection).
     GLint vpos_location;
     GLint vcol_location;
-    GLuint VBO, VAO;
+    //GLuint VBO, VAO;
     GLuint ShaderProgram;
     
 
     //camera
     mat4x4 view;
-    const vec3 EYE =  { 0.0f, 6.0f, 3.0f };
+    const vec3 EYE =  { 0.0f, 0.0f, -1.0f };
     const vec3 CENTER =  { 0.0f, 0.0f, 0.0f };
     const vec3 UP = { 0.0f, 1.0f, 0.0f }; 
 

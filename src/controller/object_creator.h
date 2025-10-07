@@ -20,6 +20,7 @@ public:
     virtual ~object_creator();
 
     shared_ptr<Object> create_object(array<float, 3> movement);
+    void free_trhreads();
     vector<shared_ptr<thread>> objects;
 
 private:

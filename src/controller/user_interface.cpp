@@ -1,4 +1,5 @@
 #include "user_interface.h"
+
 #include "object_creator.h"
 #include "../view/drawer.h"
 #include "../model/object.h"
@@ -7,7 +8,7 @@ user_interface::user_interface(shared_ptr<GLFWwindow *> window, shared_ptr<Drawe
 {
     glfwSetWindowUserPointer(*(window.get()), this);
     glfwSetMouseButtonCallback(*(window.get()), user_interface::add_object_by_click);
-    drw_ = drw;
+    //drw_ = drw;
     obj_creator = make_unique<object_creator>();
 }
 
@@ -27,8 +28,6 @@ void user_interface::add_object_by_click(GLFWwindow *window, int button, int act
             array<float, 3> position = {(float)x, (float)y, 100.0f};
             cout << "ix:"<<position[0] << " iy:"<<position[1] << " iz:"<<position[2]<< endl;
             shared_ptr<Object> objeto = this_->obj_creator->create_object(position);
-
-            objeto->record_object();
             // shared_ptr<Object> objeto1 = make_shared<Object>(position, 100, 50, this_->drw_);
             // objeto1
         }

@@ -8,7 +8,6 @@ Object::Object(array<float,3> position, float mass, float radio) :u_lock(Object:
     properties.position=position;
     properties.mass=mass;
     properties.radio=radio;
-
     cerr << "objeto creado" << endl;
 }
 
@@ -17,26 +16,30 @@ Object::~Object(){
 
 void Object::record_object(){
     lock_guard<mutex> lguard(Object::mtx);  //bloquea y se desbloquea al salir del método
-    this_ = shared_from_this(); 
-    drawer_->bodies_to_draw[this_] = false;
+    
+    this_ = shared_from_this();
+    drawer->register_Vertex_Array(this_); 
+    drawer->bodies_to_draw[this_].second = false;
     
     Object::objects_dir.push_back(shared_from_this());
 }
 
 void Object::movement2d(array<float, 3> movement_){
 
-    lock_guard<mutex> lguard(Object::mtx); 
+    //lock_guard<mutex> lguard(Object::mtx); 
     properties.movement= movement_;
     float posible_position_x = properties.position[0]+properties.movement[0];
     float posible_position_y = properties.position[1]+properties.movement[1];
     float posible_position_z = properties.position[2]+properties.movement[2];
 
-    properties.position[0]= (posible_position_x>0 && posible_position_x < 800) ? posible_position_x : properties.position[0];
-    properties.position[1]= (posible_position_y>0 && posible_position_y < 600) ? posible_position_y : properties.position[1];
-    properties.position[2]= (posible_position_z>0 && posible_position_z < 600) ? posible_position_z : properties.position[2];
-
+    properties.position[0]= (posible_position_x>X_INFERIOR_LIM && posible_position_x < X_SUPERIOR_LIM) ? posible_position_x : properties.position[0];
+    properties.position[1]= (posible_position_y>Y_INFERIOR_LIM && posible_position_y < Y_SUPERIOR_LIM) ? posible_position_y : properties.position[1];
+    properties.position[2]= (posible_position_z>Z_INFERIOR_LIM && posible_position_z < Z_SUPERIOR_LIM) ? posible_position_z : properties.position[2];
+    //cout <<this_.get()<<" x: "<<properties.position[0] << " y:" << properties.position[1]<< " z:"<< properties.position[2]<<endl;
     //si se piensa hacer que cada objeto tenga su hilo, aquí habrá competencia.
-    drawer_->bodies_to_draw[shared_from_this()] = true;  
+    u_lock.lock();
+        drawer->bodies_to_draw[this_].second = true;  
+    u_lock.unlock();
 }
 
 void Object::movement2d(){
@@ -61,19 +64,18 @@ void Object::movement2d(){
 
     //cout << "x_pos_mov: "<<posible_movement[0] << " y_pos_mov:" << posible_movement[1]<< "z_pos_mov"<< endl;
 
-    properties.position[0]= (posible_position_x>=50 && posible_position_x <=750) ? 
+    properties.position[0]= (posible_position_x>=X_INFERIOR_LIM && posible_position_x <=X_SUPERIOR_LIM) ? 
                                 posible_position_x : posible_position_x-20*(posible_movement[0]);
     
-    properties.position[1]= (posible_position_y>=50 && posible_position_y <=550) ? 
+    properties.position[1]= (posible_position_y>=Y_INFERIOR_LIM && posible_position_y <=Y_SUPERIOR_LIM) ? 
                                 posible_position_y : posible_position_y-2*(posible_movement[1]);
 
-    properties.position[2] = (posible_position_z>=50 && posible_position_z <=550) ? 
+    properties.position[2] = (posible_position_z>=Z_INFERIOR_LIM && posible_position_z <=Z_SUPERIOR_LIM) ? 
                                 posible_position_z : posible_position_z-2*(posible_movement[2]);
-    //cin.get();
-    cout << "x"<<this_.get()<<": "<<properties.position[0] << " y:" << properties.position[1]<< " z:"<< properties.position[2]<<endl;
+    //cout <<this_.get()<<" x: "<<properties.position[0] << " y:" << properties.position[1]<< " z:"<< properties.position[2]<<endl;
      //si se piensa hacer que cada objeto tenga su hilo, aquí habrá competencia.
     u_lock.lock();
-    drawer_->bodies_to_draw[shared_from_this()] = true;  
+        drawer->bodies_to_draw[this_].second = true;  
     u_lock.unlock();
 }
 

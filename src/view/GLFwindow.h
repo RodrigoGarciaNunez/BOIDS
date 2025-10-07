@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 // #ifndef GLF_WINDOW_H
 // #define GLF_WINDOW_H
 
