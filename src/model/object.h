@@ -43,6 +43,10 @@ using std::cin;
 #define Y_INFERIOR_LIM 50
 #define Z_INFERIOR_LIM 50
 
+#define MAX_SPEED 1.0f
+#define MIN_SPEED -1.0f
+
+
 using properties_ = struct properties_{ 
         //vector<float> position;
         //vector<float> movement;
@@ -102,16 +106,17 @@ private:
     float dy;
     float dz;
     float squared_dist;
-    float centering_factor;
-    float matching_factor;
-    float avoid_factor;
+    float centering_factor= 0.0005f;
+    float matching_factor = 0.5f;
+    float avoid_factor = 0.0025f;
     float aux_mov_x;
     float aux_mov_y;
     float aux_mov_z;
     float aux_pos_x;
     float aux_pos_y;
     float aux_pos_z;
-    
+    float turn_factor=0.2;
+    float speed;
     
     //el lock_guard sólo se crea cuando quieras bloquear, se desbloquea al salir del scope. No debe ser static
 

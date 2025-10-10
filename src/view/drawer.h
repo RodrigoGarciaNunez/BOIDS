@@ -69,8 +69,8 @@ private:
 
     //camera
     mat4x4 view;
-    const vec3 EYE =  { 0.0f, 0.0f, -1.5f };
-    const vec3 CENTER =  { 0.0f, 0.0f, 0.0f };
+    const vec3 EYE =  { -1.0f, 1.0f, -7.0f };
+    const vec3 CENTER =  { 28.0f, 20.0f, 55.0f };
     const vec3 UP = { 0.0f, 1.0f, 0.0f }; 
 
     // perspectiva

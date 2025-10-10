@@ -44,32 +44,30 @@ void Object::movement2d(){
     
     //lock_guard<mutex> lguard(Object::mtx); 
     //u_lock.lock();
-    array<float, 3> posible_movement = boid_movement();
-    //cerr << "x_mov: "<<posible_movement[0] << " y_mov:" << posible_movement[1]<< endl;
+    array<float, 3> movement = boid_movement();
+    //cerr << "x_mov: "<<movement[0] << " y_mov:" << movement[1]<< endl;
 
-    if(posible_movement[0] == 0 && posible_movement[1]==0 && posible_movement[2] == 0){
-        //cerr << "inercico" << endl;
-        posible_movement[0] =  properties.movement[0];
-        posible_movement[1] = properties.movement[1];
-        posible_movement[2] = properties.movement[2];
-    } 
+    if(movement[0] != 0 || movement[1]!=0 || movement[2] != 0){  //no incercico
+        properties.movement = movement;
+    }
+    else movement = properties.movement;
 
-    //properties.movement =  (posible_movement[0]!= 0 || posible_movement[1]!= 0) ? posible_movement : properties.movement;
+    //properties.movement =  (movement[0]!= 0 || movement[1]!= 0) ? movement : properties.movement;
      
-    float posible_position_x = properties.position[0]+posible_movement[0];
-    float posible_position_y = properties.position[1]+posible_movement[1];
-    float posible_position_z = properties.position[2]+posible_movement[2]; 
+    float posible_position_x = properties.position[0]+movement[0];
+    float posible_position_y = properties.position[1]+movement[1];
+    float posible_position_z = properties.position[2]+movement[2]; 
 
-    //cout << "x_pos_mov: "<<posible_movement[0] << " y_pos_mov:" << posible_movement[1]<< "z_pos_mov"<< endl;
+    //cout << "x_pos_mov: "<<movement[0] << " y_pos_mov:" << movement[1]<< "z_pos_mov"<< endl;
 
     properties.position[0]= (posible_position_x>=X_INFERIOR_LIM && posible_position_x <=X_SUPERIOR_LIM) ? 
-                                posible_position_x : posible_position_x;
+                                posible_position_x : posible_position_x-150*(movement[0]);
     
     properties.position[1]= (posible_position_y>=Y_INFERIOR_LIM && posible_position_y <=Y_SUPERIOR_LIM) ? 
-                                posible_position_y : posible_position_y;
+                                posible_position_y : posible_position_y-150*(movement[1]);
 
     properties.position[2] = (posible_position_z>=Z_INFERIOR_LIM && posible_position_z <=Z_SUPERIOR_LIM) ? 
-                                posible_position_z : posible_position_z;
+                                posible_position_z : posible_position_z-150*(movement[2]);
     //cout <<this_.get()<<" x: "<<properties.position[0] << " y:" << properties.position[1]<< " z:"<< properties.position[2]<<endl;
      //si se piensa hacer que cada objeto tenga su hilo, aquí habrá competencia.
     //u_lock.lock();
@@ -93,9 +91,10 @@ array<float, 3> Object::boid_movement(){
     dy=0.0f;
     dz=0.0f;
     squared_dist = 0.0f;
-    centering_factor = 0.005f;
-    matching_factor = 0.05f;
-    avoid_factor = 0.05f;
+
+    // centering_factor = 0.005f;
+    // matching_factor = 0.020f;
+    // avoid_factor = 0.05f;
     aux_mov_x=0.0f;
     aux_mov_y=0.0f; 
     aux_mov_z=0.0f;
@@ -144,7 +143,7 @@ array<float, 3> Object::boid_movement(){
             }
         }
     }
-     u_lock.unlock();
+    u_lock.unlock();
     //u_lock.unlock();
     //cerr << xpos_avg << endl;
     if(neighbor > 0){
@@ -170,6 +169,20 @@ array<float, 3> Object::boid_movement(){
     aux_mov_x += (close_dx*avoid_factor);
     aux_mov_y += (close_dy*avoid_factor);
     aux_mov_z += (close_dz*avoid_factor);
+
+    speed = sqrt(aux_mov_x*aux_mov_x + aux_mov_y*aux_mov_y + aux_mov_z*aux_mov_z);
+    properties.speed = speed;
+
+    if(properties.speed < MIN_SPEED){
+        aux_mov_x = (aux_mov_x/speed) * MIN_SPEED;
+        aux_mov_y = (aux_mov_y/speed) * MIN_SPEED;
+        aux_mov_z = (aux_mov_z/speed) * MIN_SPEED;
+    }
+    if(properties.speed > MAX_SPEED){
+        aux_mov_x = (aux_mov_x/speed) * MAX_SPEED;
+        aux_mov_y = (aux_mov_y/speed) * MAX_SPEED;
+        aux_mov_z = (aux_mov_z/speed) * MAX_SPEED;
+    }
 
     movement={aux_mov_x,aux_mov_y,aux_mov_z};
     return movement;
