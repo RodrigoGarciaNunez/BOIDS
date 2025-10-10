@@ -4,4 +4,4 @@ Currently working on boids algorithm.
 
 Here's an example of the current state of the program
 
-![Boids_demo](demo_gifs/demo_boids.png)
+![Boids_demo](demo_gifs/demo_boids.gif)
