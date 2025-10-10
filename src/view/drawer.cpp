@@ -137,8 +137,10 @@ GLuint Drawer::createVertexArray()
     return VAO; // Devolvemos el VAO para usarlo en el render
 }
 
-void Drawer::register_Vertex_Array(shared_ptr<Object> objecto){
-    bodies_to_draw[objecto].first = createVertexArray(); 
+void Drawer::register_body2draw(shared_ptr<Object> objeto){
+    bodies_to_draw[objeto].first = createVertexArray();
+    bodies_to_draw[objeto].second = false;
+
 }
 void Drawer::render()
 {
@@ -152,7 +154,6 @@ void Drawer::render()
     {
         body_properties = object.first->getProperties();
         body_position = body_properties.position;
-        int subs = 1;
         //if (object.second.second == true)
         //{
             mat4x4 model, mvp;
@@ -161,7 +162,7 @@ void Drawer::render()
             
             //cin.get();
             //mat4x4_rotate_Z(model, model, (float)glfwGetTime());
-            mat4x4_translate(model,0.01*(body_position[0]), 0.01f*(body_position[1]), 0.0f+glfwGetTime());
+            mat4x4_translate(model,0.01*(body_position[0]), 0.01f*(body_position[1]), 0.01f*(body_position[2]));
             mat4x4_mul(mvp, view, model);
             mat4x4_mul(mvp, projection, mvp);
             cout << object.first.get()<<" "<<object.second.first<< endl;
@@ -169,7 +170,6 @@ void Drawer::render()
             glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat *)&mvp);
             glBindVertexArray(object.second.first);
             glDrawArrays(GL_TRIANGLES, 0, 18); // 6 caras x 3 vertices = 18
-            subs++;        
         //}
     }
     glfwSwapBuffers(*(window.get()));

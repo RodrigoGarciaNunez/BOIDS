@@ -36,7 +36,7 @@ class Drawer: public enable_shared_from_this<Drawer>{
 public:
     Drawer(shared_ptr<GLFWwindow *> window_);
     GLuint createVertexArray();
-    void register_Vertex_Array(shared_ptr<Object> objecto);
+    void register_body2draw(shared_ptr<Object> objecto);
     vector<float> generateCircleVertex(float radius, float resolution);
     void render();
 
@@ -69,7 +69,7 @@ private:
 
     //camera
     mat4x4 view;
-    const vec3 EYE =  { 0.0f, 0.0f, -1.0f };
+    const vec3 EYE =  { 0.0f, 0.0f, -1.5f };
     const vec3 CENTER =  { 0.0f, 0.0f, 0.0f };
     const vec3 UP = { 0.0f, 1.0f, 0.0f }; 
 

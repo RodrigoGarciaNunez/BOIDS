@@ -3,7 +3,7 @@
 Window::Window(float screenHeight, float screenWidht)
 {
     properties.screenHeight=screenHeight;
-    properties.screenWidth=2*screenWidht;
+    properties.screenWidth=screenWidht;
     properties.centerX=screenWidht/2.0f;
     properties.centerY=screenHeight/2.0f;
 

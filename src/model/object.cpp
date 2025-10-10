@@ -16,11 +16,9 @@ Object::~Object(){
 
 void Object::record_object(){
     lock_guard<mutex> lguard(Object::mtx);  //bloquea y se desbloquea al salir del método
-    
     this_ = shared_from_this();
-    drawer->register_Vertex_Array(this_); 
-    drawer->bodies_to_draw[this_].second = false;
-    
+    drawer->register_body2draw(this_); 
+    //drawer->bodies_to_draw[this_].second = false;
     Object::objects_dir.push_back(shared_from_this());
 }
 
@@ -37,9 +35,9 @@ void Object::movement2d(array<float, 3> movement_){
     properties.position[2]= (posible_position_z>Z_INFERIOR_LIM && posible_position_z < Z_SUPERIOR_LIM) ? posible_position_z : properties.position[2];
     //cout <<this_.get()<<" x: "<<properties.position[0] << " y:" << properties.position[1]<< " z:"<< properties.position[2]<<endl;
     //si se piensa hacer que cada objeto tenga su hilo, aquí habrá competencia.
-    u_lock.lock();
+    //u_lock.lock();
         drawer->bodies_to_draw[this_].second = true;  
-    u_lock.unlock();
+    //u_lock.unlock();
 }
 
 void Object::movement2d(){
@@ -65,74 +63,80 @@ void Object::movement2d(){
     //cout << "x_pos_mov: "<<posible_movement[0] << " y_pos_mov:" << posible_movement[1]<< "z_pos_mov"<< endl;
 
     properties.position[0]= (posible_position_x>=X_INFERIOR_LIM && posible_position_x <=X_SUPERIOR_LIM) ? 
-                                posible_position_x : posible_position_x-20*(posible_movement[0]);
+                                posible_position_x : posible_position_x;
     
     properties.position[1]= (posible_position_y>=Y_INFERIOR_LIM && posible_position_y <=Y_SUPERIOR_LIM) ? 
-                                posible_position_y : posible_position_y-2*(posible_movement[1]);
+                                posible_position_y : posible_position_y;
 
     properties.position[2] = (posible_position_z>=Z_INFERIOR_LIM && posible_position_z <=Z_SUPERIOR_LIM) ? 
-                                posible_position_z : posible_position_z-2*(posible_movement[2]);
+                                posible_position_z : posible_position_z;
     //cout <<this_.get()<<" x: "<<properties.position[0] << " y:" << properties.position[1]<< " z:"<< properties.position[2]<<endl;
      //si se piensa hacer que cada objeto tenga su hilo, aquí habrá competencia.
-    u_lock.lock();
+    //u_lock.lock();
         drawer->bodies_to_draw[this_].second = true;  
-    u_lock.unlock();
+    //u_lock.unlock();
 }
 
 array<float, 3> Object::boid_movement(){
-    float xpos_avg=0.0f; 
-    float ypos_avg=0.0f;
-    float zpos_avg = 0.0f; 
-    float xvel_avg=0.0f; 
-    float yvel_avg=0.0f; 
-    float zvel_avg=0.0f;
-    float close_dx= 0.0f; 
-    float close_dy = 0.0f;
-    float close_dz= 0.0f;
-    float visual_range = 2*(properties.radio)+20.0f;
-    float protected_range = 2*(properties.radio)+10.0f;
-    float dx=0.0f;
-    float dy=0.0f;
-    float dz=0.0f;
-    float squared_dist = 0.0f;
-    float centering_factor = 0.005f;
-    float matching_factor = 0.05f;
-    float avoid_factor = 0.05f;
-    float aux_mov_x=0.0f;
-    float aux_mov_y=0.0f; 
-    float aux_mov_z=0.0f;
-    float aux_pos_x=0.0f; 
-    float aux_pos_y=0.0;
-    float aux_pos_z=0.0f;
+    xpos_avg=0.0f; 
+    ypos_avg=0.0f;
+    zpos_avg = 0.0f; 
+    xvel_avg=0.0f; 
+    yvel_avg=0.0f; 
+    zvel_avg=0.0f;
+    close_dx= 0.0f; 
+    close_dy = 0.0f;
+    close_dz= 0.0f;
+    visual_range = 2*(properties.radio)+20.0f;
+    protected_range = 2*(properties.radio)+10.0f;
+    dx=0.0f;
+    dy=0.0f;
+    dz=0.0f;
+    squared_dist = 0.0f;
+    centering_factor = 0.005f;
+    matching_factor = 0.05f;
+    avoid_factor = 0.05f;
+    aux_mov_x=0.0f;
+    aux_mov_y=0.0f; 
+    aux_mov_z=0.0f;
+    aux_pos_x=0.0f; 
+    aux_pos_y=0.0;
+    aux_pos_z=0.0f;
 
     array<float, 3> self_pos = properties.position;
     array<float, 3> self_mov = properties.movement;
-    //pair<float, float> other_boid_pos, other_boid_mov;
+    array<float, 3> other_boid_pos;
+    array<float, 3> other_boid_mov;
+
     array<float, 3> movement={0.0f,0.0f,0.0f};
     int neighbor=0;
     u_lock.lock();
     for(auto &boid : objects_dir){
         if(boid != this_){
-            dx = self_pos[0] - boid->properties.position[0];
-            dy = self_pos[1] - boid->properties.position[1];
-            dz = self_pos[2] - boid->properties.position[2];
+            
+            other_boid_mov = boid->properties.movement;
+            other_boid_pos = boid->properties.position;
+           
+            dx = self_pos[0] - other_boid_pos[0];
+            dy = self_pos[1] - other_boid_pos[1];
+            dz = self_pos[2] - other_boid_pos[2];
 
             if(abs(dx) < visual_range && abs(dy) < visual_range && abs(dz) < visual_range){
                 squared_dist = dx*dx + dy*dy + dz*dz;
 
                 if (squared_dist < pow(protected_range, 2.0f)){
-                    close_dx += self_pos[0]- boid->properties.position[0];
-                    close_dy += self_pos[1]- boid->properties.position[1];
-                    close_dz += self_pos[2]- boid->properties.position[2];
+                    close_dx += self_pos[0]- other_boid_pos[0];
+                    close_dy += self_pos[1]- other_boid_pos[1];
+                    close_dz += self_pos[2]- other_boid_pos[2];
                 }
                 else if(squared_dist < pow(visual_range,2.0f)){
-                    xpos_avg += boid->properties.position[0];
-                    ypos_avg += boid->properties.position[1];
-                    zpos_avg += boid->properties.position[2];
+                    xpos_avg += other_boid_pos[0];
+                    ypos_avg += other_boid_pos[1];
+                    zpos_avg += other_boid_pos[2];
 
-                    xvel_avg += boid->properties.movement[0];
-                    yvel_avg += boid->properties.movement[1];
-                    zpos_avg += boid->properties.position[2];
+                    xvel_avg += other_boid_mov[0];
+                    yvel_avg += other_boid_mov[1];
+                    zvel_avg += other_boid_mov[2];
 
                     neighbor++;
                 }
@@ -140,7 +144,8 @@ array<float, 3> Object::boid_movement(){
             }
         }
     }
-    u_lock.unlock();
+     u_lock.unlock();
+    //u_lock.unlock();
     //cerr << xpos_avg << endl;
     if(neighbor > 0){
         
@@ -179,7 +184,7 @@ void Object::run(){
   
     random_device rd;
     mt19937 gen(rd());
-    uniform_real_distribution<> dist(-5, 5);
+    uniform_real_distribution<> dist(-0.005, 0.005);
     movement[0] = dist(gen);
     movement[1] = dist(gen);
     movement[2] = dist(gen);

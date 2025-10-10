@@ -83,6 +83,34 @@ private:
     static vector<shared_ptr<Object>> objects_dir;
     static mutex mtx;
     unique_lock<mutex> u_lock;
+
+
+
+    //BOID MOVEMENT ARGS
+    float xpos_avg;
+    float ypos_avg;
+    float zpos_avg;
+    float xvel_avg;
+    float yvel_avg;
+    float zvel_avg;
+    float close_dx;
+    float close_dy;
+    float close_dz;
+    float visual_range;
+    float protected_range;
+    float dx;
+    float dy;
+    float dz;
+    float squared_dist;
+    float centering_factor;
+    float matching_factor;
+    float avoid_factor;
+    float aux_mov_x;
+    float aux_mov_y;
+    float aux_mov_z;
+    float aux_pos_x;
+    float aux_pos_y;
+    float aux_pos_z;
     
     
     //el lock_guard sólo se crea cuando quieras bloquear, se desbloquea al salir del scope. No debe ser static
